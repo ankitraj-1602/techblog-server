@@ -13,6 +13,22 @@ export const getAllUser = async (req, res, next) => {
   }
   return res.status(200).json({ users });
 };
+export const getUser = async (req, res, next) => {
+  let {id} = req.params;
+  let user;
+  try {
+    console.log(id)
+    user = await User.findOne({_id:id});
+    console.log(user)
+  } catch (err) {
+    console.log(err);
+  }
+  if (!user) {
+    return res.status(404).json({ message: "No Users Found" });
+  }
+  return res.status(200).json({ user });
+};
+
 
 export const signup = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -27,6 +43,7 @@ export const signup = async (req, res, next) => {
       .status(400)
       .json({ message: "User Already Exists! Login Instead" });
   }
+
   const hashedPassword = bcrypt.hashSync(password);
 
   const user = new User({
@@ -35,13 +52,16 @@ export const signup = async (req, res, next) => {
     password: hashedPassword,
     blogs: [],
   });
-
+  
   try {
     await user.save();
+    console.log('User saved:', user);
+    return res.send("data");
   } catch (err) {
-    return console.log(err);
+    console.error('Error saving user:', err);
+    return res.send("datafff");
   }
-  return res.status(201).json({ user });
+  
 };
 
 export const login = async (req, res, next) => {
